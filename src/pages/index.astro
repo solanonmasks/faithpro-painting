@@ -1,0 +1,267 @@
+---
+import { Image } from 'astro:assets';
+import '../styles/global.css';
+import Photo from '../components/Photo.astro';
+import logo from '../assets/faithpro-logo.png';
+import { SITE, PHOTOS, FORM_ENDPOINT } from '../data/site';
+import { TRUST, SERVICES, STANDARD, PROCESS, REVIEWS, CHIPS } from '../data/content';
+
+const site = Astro.site;
+const canonical = site ? new URL('/', site).href : undefined;
+const ogImage = site ? new URL('/og-image.png', site).href : '/og-image.png';
+const pad = (n: number) => String(n).padStart(2, '0');
+
+// LocalBusiness structured data: only facts given in the design handoff.
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'LocalBusiness',
+  name: SITE.name,
+  description: SITE.description,
+  telephone: '+1-778-798-2535',
+  email: SITE.email,
+  foundingDate: '2010',
+  ...(canonical ? { url: canonical, image: ogImage } : {}),
+  areaServed: SITE.areas.map((name) => ({ '@type': 'Place', name })),
+};
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{SITE.title}</title>
+    <meta name="description" content={SITE.description} />
+    {canonical && <link rel="canonical" href={canonical} />}
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/favicon.png" />
+    <meta name="theme-color" content="#071A35" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:title" content={SITE.title} />
+    <meta property="og:description" content={SITE.description} />
+    {canonical && <meta property="og:url" content={canonical} />}
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </head>
+  <body>
+    <div id="top" class="page">
+      <div class="topbar">
+        <div class="wrap topbar__inner">
+          <span>Premium painting across the Lower Mainland and Fraser Valley · Since 2010</span>
+          <span><a href={`mailto:${SITE.email}`}>{SITE.email}</a> · <a href={SITE.phoneHref}>{SITE.phone}</a></span>
+        </div>
+      </div>
+
+      <header class="header">
+        <div class="wrap header__inner">
+          <a href="#top" class="header__logo">
+            <Image src={logo} alt="FaithPro Painting Ltd." height={70} densities={[1, 2]} loading="eager" />
+          </a>
+          <nav class="nav" aria-label="Main">
+            <a href="#services">Services</a>
+            <a href="#standard">Our standard</a>
+            <a href="#reviews">Reviews</a>
+            <a href="#quote">Contact</a>
+          </nav>
+          <a href="#quote" class="btn header__cta">Free quote</a>
+        </div>
+      </header>
+
+      <main>
+        <section class="hero">
+          <div class="wrap hero__inner">
+            <div class="hero__text">
+              <p data-hero style="--i:0" class="eyebrow">Interior · Exterior · Cabinets · Commercial</p>
+              <h1 data-hero style="--i:1" class="serif">Finish with <em>confidence.</em></h1>
+              <p data-hero style="--i:2" class="hero__lede">Professional painting for homes, businesses and distinctive properties across Surrey, Vancouver, Maple Ridge, Richmond, Port Coquitlam, Chilliwack and the Fraser Valley.</p>
+              <div data-hero style="--i:3" class="hero__ctas">
+                <a href="#quote" class="btn btn--light">Request a free quote</a>
+                <a href={SITE.phoneHref} class="btn btn--outline">{SITE.phone}</a>
+              </div>
+            </div>
+            <div data-hero style="--i:4" class="hero__compare">
+              <div
+                class="ba"
+                data-ba
+                role="slider"
+                tabindex="0"
+                aria-label="Before and after comparison"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                aria-valuenow="50"
+              >
+                <Photo photo={PHOTOS.heroAfter} alt="House exterior after painting by FaithPro" class="ba__img" eager sizes="(min-width: 1000px) 55vw, 100vw" />
+                <Photo photo={PHOTOS.heroBefore} alt="Same house exterior before painting" class="ba__img ba__before" eager sizes="(min-width: 1000px) 55vw, 100vw" />
+                <span class="ba__tag ba__tag--before">Before</span>
+                <span class="ba__tag ba__tag--after">After</span>
+                <div class="ba__line"></div>
+                <div class="ba__handle" aria-hidden="true">↔</div>
+              </div>
+              <p class="hero__caption">Drag to compare the same exterior, before and after.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="trust">
+          <div class="wrap trust__grid">
+            {TRUST.map((t) => (
+              <div class="trust__item">
+                <span class="trust__title">{t.t}</span>
+                <span class="trust__desc">{t.d}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section id="services" class="wrap services">
+          <div data-reveal class="split-head">
+            <h2 class="serif">Premium painting for <em>every surface.</em></h2>
+            <p class="services__intro">Clear scope, careful prep and a finish designed for your property.</p>
+          </div>
+          <div class="services__grid">
+            {SERVICES.map((s) => (
+              <div data-reveal class="service">
+                <h3 class="serif">{s.t}</h3>
+                <p>{s.d}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section id="standard" class="standard">
+          <div class="standard__grid">
+            <div class="standard__media">
+              <Photo photo={PHOTOS.exteriorWork} alt="FaithPro painter working on exterior trim" class="standard__img" sizes="(min-width: 1000px) 43vw, 100vw" />
+            </div>
+            <div class="standard__body">
+              <p data-reveal class="eyebrow">The FaithPro standard</p>
+              <h2 data-reveal class="serif">Beautiful results begin with <em>disciplined preparation.</em></h2>
+              <p data-reveal class="standard__intro">We protect the property, prepare the surface and choose the right application method before the finish goes on. That process is what gives a premium paint job its clean, lasting look.</p>
+              <div class="standard__points">
+                {STANDARD.map((p) => (
+                  <div data-reveal class="point">
+                    <h3>{p.t}</h3>
+                    <p>{p.d}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="wrap process">
+          <h2 data-reveal class="serif">From first walkthrough <em>to final check.</em></h2>
+          <div class="process__grid">
+            {PROCESS.map((p) => (
+              <div data-reveal class="step">
+                <span class="step__name">{p.t}</span>
+                <p>{p.d}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section id="reviews" class="reviews" data-reviews>
+          <div class="wrap reviews__inner">
+            <div data-reveal class="reviews__bar">
+              <span class="reviews__label">Google reviews · ★★★★★</span>
+              <div class="reviews__controls">
+                <span class="reviews__count" data-rev-count aria-live="polite">01 / {pad(REVIEWS.length)}</span>
+                <button type="button" class="rev-btn" data-rev-prev aria-label="Previous review">←</button>
+                <button type="button" class="rev-btn rev-btn--next" data-rev-next aria-label="Next review">→</button>
+              </div>
+            </div>
+            <div class="reviews__stage">
+              {REVIEWS.map((r, i) => (
+                <figure class="review" data-review hidden={i !== 0}>
+                  <h3>{r.h}</h3>
+                  <blockquote>“{r.q}”</blockquote>
+                  <figcaption><strong>{r.n}</strong> · {r.c}</figcaption>
+                </figure>
+              ))}
+            </div>
+            <a href={SITE.reviewUrl} target="_blank" rel="noopener" class="reviews__link">Read more on Google</a>
+          </div>
+        </section>
+
+        <section id="quote" class="quote">
+          <div class="wrap quote__inner">
+            <div class="quote__info">
+              <h2 data-reveal class="serif">Ready to transform <em>your property?</em></h2>
+              <p data-reveal class="quote__lede">Tell us what you’re planning and we’ll help you choose the right finish.</p>
+              <a data-reveal href={SITE.phoneHref} class="quote__phone">{SITE.phone}</a>
+              <a data-reveal href={`mailto:${SITE.email}`} class="quote__email">{SITE.email}</a>
+              <div data-reveal class="quote__areas">
+                <span class="eyebrow">Serving</span>
+                <span class="quote__areas-list">{SITE.areas.join(' · ')}</span>
+              </div>
+            </div>
+            <div>
+              <form
+                data-reveal
+                data-quote-form
+                class="form"
+                method="POST"
+                action={FORM_ENDPOINT || undefined}
+                data-endpoint={FORM_ENDPOINT}
+              >
+                <div class="form__fields">
+                  <label class="field">Name<input name="name" autocomplete="name" required /></label>
+                  <label class="field">Phone<input name="phone" type="tel" autocomplete="tel" required /></label>
+                  <label class="field">Email<input name="email" type="email" autocomplete="email" /></label>
+                  <label class="field">City<input name="city" autocomplete="address-level2" /></label>
+                </div>
+                <div class="form__group" role="group" aria-labelledby="project-type-label">
+                  <span class="form__label" id="project-type-label">Project type</span>
+                  <div class="chips">
+                    {CHIPS.map((c) => (
+                      <button type="button" class="chip" data-chip={c} aria-pressed="false">{c}</button>
+                    ))}
+                  </div>
+                  <input type="hidden" name="project_type" value="" data-chips-value />
+                </div>
+                <label class="field">Project details<textarea name="details" rows="4"></textarea></label>
+                <p class="form__error" data-form-error hidden>Sorry, something went wrong. Please call {SITE.phone} or email {SITE.email}.</p>
+                <button type="submit" class="form__submit">Request my quote</button>
+              </form>
+              <div class="thanks" data-thanks hidden role="status">Thank you. We’ll be in touch about your quote.</div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <div class="wrap footer__inner">
+          <span class="footer__logo">
+            <Image src={logo} alt="FaithPro Painting Ltd." height={54} densities={[1, 2]} />
+          </span>
+          <span>Insured · WorkSafeBC · Benjamin Moore &amp; Sherwin-Williams · Established 2010</span>
+          <div class="footer__legal">
+            <span>© 2026 FaithPro Painting Ltd.</span>
+            <a href="https://backpackdigitalmedia.com" target="_blank" rel="noopener">Powered by Backpack Digital Media</a>
+          </div>
+        </div>
+      </footer>
+
+      <div class="mobile-bar">
+        <a href={SITE.phoneHref} class="mobile-bar__call">Call</a>
+        <a href="#quote" class="mobile-bar__quote">Free quote</a>
+      </div>
+    </div>
+
+    <script>
+      import '../scripts/main.ts';
+    </script>
+  </body>
+</html>
